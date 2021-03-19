@@ -10,11 +10,13 @@ version = ''
 
 class SectorAlarm:
 
-    def __init__(self, username, password, siteid, panelcode):
+    def __init__(self, username, password, siteid, panelcode, plugid, plugstatus):
         self.username = username
         self.password = password
         self.code = panelcode
         self.siteid = siteid
+        self.plugid = plugid
+        self.plugstatus = plugstatus
 
     def Login(self):
 
@@ -174,4 +176,55 @@ class SectorAlarm:
 
 
         return temps
-        
+
+
+    def GetPlugs(self):
+        plugs = []
+
+        self.Login()
+
+        payload = { "WithStatus": "true", "id": self.siteid }
+
+        headers = {
+            'Accept': 'application/json, text/plain, */*',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'en-US,en;q=0.9,sv;q=0.8',
+            'Cache-Control': 'max-age=0',
+            'Content-Type': 'application/json;charset=UTF-8',
+            "Content-Length": str(sys.getsizeof(payload)),
+            'Connection': 'keep-alive',
+            'User-Agent' : 'Safari/537.36'
+        }
+
+        response = req.get(baseUrl + '/SmartPlugs/GetsmartPlugsForPanel', data=json.dumps(payload), headers=headers)
+
+        for plug in json.loads(response.text):
+            plugs.append((plug["Label"], plug["Id"], plug["Status"]))
+
+
+        return plugs
+
+
+    def SwitchPlug(self):
+
+        self.Login()
+
+        payload = { "id": self.siteid, "SwitchStatus": self.plugstatus, "SwitchId": self.plugid }
+
+        headers = {
+            'Accept': 'application/json, text/plain, */*',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'en-US,en;q=0.9,sv;q=0.8',
+            'Cache-Control': 'max-age=0',
+            'Content-Type': 'application/json;charset=UTF-8',
+            "Content-Length": str(sys.getsizeof(payload)),
+            'Connection': 'keep-alive',
+            'User-Agent' : 'Safari/537.36'
+        }
+
+        response = req.post(baseUrl + '/SmartPlugs/SwitchSmartPlug', data=json.dumps(payload), headers=headers)
+
+        svar = json.loads(response.text)
+
+
+        return svar
