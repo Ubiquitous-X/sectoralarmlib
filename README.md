@@ -1,3 +1,5 @@
+# Sector Alarm library with smart plug support
+
 Added support for the Sector Alarm smart plugs to the original library written by  [Per-Øyvind Bruun.](https://github.com/peroyvind)
 
 First get the id of your smart plug(s), then send either 'on' or 'off'.
